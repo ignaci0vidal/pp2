@@ -6,4 +6,4 @@ class Pedido {
     	this.fecha = fecha;
     	this.estado_pedido = estado_pedido;
   	}
-  }
+};
