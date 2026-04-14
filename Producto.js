@@ -10,5 +10,33 @@ class Producto {
     return this.stock >= cantidad;
   }
 
-  
+  reducirStock(cantidad) {
+    if (cantidad <= 0) {
+      throw new Error("La cantidad a reducir debe ser mayor a 0.");
+    }
+
+    if (!this.hayStock(cantidad)) {
+      throw new Error(`No hay stock suficiente para ${this.descripcion}.`);
+    }
+
+    this.stock -= cantidad;
+  }
+
+  aumentarStock(cantidad) {
+    if (cantidad <= 0) {
+      throw new Error("La cantidad a aumentar debe ser mayor a 0.");
+    }
+
+    this.stock += cantidad;
+  }
+
+  actualizarPrecio(nuevoPrecio) {
+    if (nuevoPrecio <= 0) {
+      throw new Error("El precio debe ser mayor a 0.");
+    }
+
+    this.precio = nuevoPrecio;
+  }
+
+
 }
