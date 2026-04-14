@@ -11,7 +11,19 @@ class Cliente {
   esCorporativo() {
     return this.tipoCliente.toLowerCase() === "corporativo";
   }
-  
+
+  actualizarEmail(nuevoEmail) {
+    this.email = nuevoEmail;
+  }
+
+  cambiarDireccion(nuevaDireccion) {
+    this.direccion = nuevaDireccion;
+  }
+
+  cambiarCondicionIVA(nuevaCondicionIVA) {
+    this.condicionIVA = nuevaCondicionIVA;
+  }
+
 };
 
 
