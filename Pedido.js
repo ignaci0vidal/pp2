@@ -1,67 +1,91 @@
 class Pedido {
-    constructor(id_Cliente, id_cupon = null, estado_pedido = 'pendiente', fecha = new Date(), id_pedido = null) {
+    constructor( id_pedido, id_cliente, id_cupon, fecha_creacion, estado, created_at, updated_at ) {
         this.id_pedido = id_pedido;
-        this.id_Cliente = id_Cliente;
+        this.id_cliente = id_cliente;
         this.id_cupon = id_cupon;
-        this.fecha = fecha;
-        this.estado_pedido = estado_pedido;
+        this.fecha_creacion = fecha_creacion;
+        this.estado = estado;
+        this.created_at = created_at;
+        this.updated_at = updated_at;
     }
 
-    // --- MÉTODOS CRUD ESTÁTICOS ---
-
-    // CREATE: Registrar la cabecera del pedido
-    static async create(pool, pedido) {
-        const query = `
-            INSERT INTO pedidos (id_cliente, id_cupon, estado, fecha)
-            VALUES ($1, $2, $3, $4)
-            RETURNING id_pedido;
-        `;
-        const values = [
-            pedido.id_Cliente, 
-            pedido.id_cupon, 
-            pedido.estado_pedido, 
-            pedido.fecha
-        ];
-        const res = await pool.query(query, values);
-        return res.rows[0].id_pedido;
+    getIdPedido() {
+        return this.id_pedido;
     }
 
-    // READ: Obtener un pedido por su ID (incluyendo el total calculado)
-    static async getById(pool, id_pedido) {
-        const query = 'SELECT * FROM pedidos WHERE id_pedido = $1';
-        const res = await pool.query(query, [id_pedido]);
-        
-        if (res.rows.length === 0) return null;
-        
-        const p = res.rows[0];
-        return new Pedido(p.id_cliente, p.id_cupon, p.estado, p.fecha, p.id_pedido);
+    getIdCliente() {
+        return this.id_cliente;
     }
 
-    // READ ALL: Obtener todos los pedidos de un cliente
-    static async getByCliente(pool, id_cliente) {
-        const query = 'SELECT * FROM pedidos WHERE id_cliente = $1 ORDER BY fecha DESC';
-        const res = await pool.query(query, [id_cliente]);
-        return res.rows.map(p => new Pedido(p.id_cliente, p.id_cupon, p.estado, p.fecha, p.id_pedido));
+    getIdCupon() {
+        return this.id_cupon;
     }
 
-    // UPDATE: Cambiar el estado (Ej: de 'pendiente' a 'pagado')
-    // Regla de negocio: Solo se emite ticket si el estado es 'pagado'
-    static async updateEstado(pool, id_pedido, nuevoEstado) {
-        const estadosValidos = ['pendiente', 'pagado', 'cancelado'];
-        if (!estadosValidos.includes(nuevoEstado)) {
-            throw new Error("Estado no válido");
+    getFechaCreacion() {
+        return this.fecha_creacion;
+    }
+
+    getEstado() {
+        return this.estado;
+    }
+
+    getCreatedAt() {
+        return this.created_at;
+    }
+
+    getUpdatedAt() {
+        return this.updated_at;
+    }
+}
+
+class PedidoManager {
+    constructor() {
+        this.pedidos = [];
+    }
+
+    // 1. CREATE: Agregar un nuevo pedido
+    create(pedido) {
+        if (!(pedido instanceof Pedido)) {
+            throw new Error("El objeto no es una instancia de Pedido");
         }
-
-        const query = 'UPDATE pedidos SET estado = $1 WHERE id_pedido = $2 RETURNING *';
-        const res = await pool.query(query, [nuevoEstado, id_pedido]);
-        return res.rows[0];
+        this.pedidos.push(pedido);
+        console.log(`Pedido ${pedido.id_pedido} creado con éxito.`);
+        return pedido;
     }
 
-    // DELETE: Eliminar un pedido
-    // Nota: Por integridad referencial, esto suele borrar también los detalles si usaste ON DELETE CASCADE
-    static async delete(pool, id_pedido) {
-        const query = 'DELETE FROM pedidos WHERE id_pedido = $1';
-        await pool.query(query, [id_pedido]);
-        return { success: true, message: `Pedido ${id_pedido} eliminado` };
+    // 2. READ: Obtener todos o uno solo por ID
+    findAll() {
+        return this.pedidos;
+    }
+
+    findById(id) {
+        const pedido = this.pedidos.find(p => p.id_pedido === id);
+        return pedido || null;
+    }
+
+    // 3. UPDATE: Actualizar datos de un pedido existente
+    update(id, nuevosDatos) {
+        const index = this.pedidos.findIndex(p => p.id_pedido === id);
+        
+        if (index !== -1) {
+            // Mantenemos la identidad del objeto y actualizamos sus propiedades
+            this.pedidos[index] = { 
+                ...this.pedidos[index], 
+                ...nuevosDatos, 
+                updated_at: new Date().toISOString() // Actualización automática de fecha
+            };
+            return this.pedidos[index];
+        }
+        return null;
+    }
+
+    // 4. DELETE: Eliminar un pedido
+    delete(id) {
+        const index = this.pedidos.findIndex(p => p.id_pedido === id);
+        if (index !== -1) {
+            const eliminado = this.pedidos.splice(index, 1);
+            return eliminado[0];
+        }
+        return null;
     }
 }
