@@ -1,10 +1,15 @@
 class Detalle_Pedido {
 	constructor(id_pedido, id_detalle, id_producto, cantidad, precio_unitario){
+    if (cantidad <= 0) {
+    throw new Error("La cantidad debe ser mayor a cero");
+    }
+
 		this.id_pedido = id_pedido;
 		this.id_detalle = id_detalle;
 		this.id_producto = id_producto;
 		this.cantidad = cantidad;
 		this.precio_unitario = precio_unitario;
+        
   	}
 
 	// Regla de negocio: El subtotal es cantidad * precio_unitario

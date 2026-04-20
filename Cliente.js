@@ -1,6 +1,6 @@
 class Cliente {
-  constructor(idCliente, nombre, email, tipoCliente, condicionIVA, cuit_cuil, direccion) {
-    this.idCliente = idCliente;
+  constructor(id_cliente, nombre, email, tipoCliente, condicionIVA, cuit_cuil, direccion) {
+   this.id_cliente = id_cliente;
     this.nombre = nombre;
     this.email = email;
     this.tipoCliente = tipoCliente; // ej: "Final", "Corporativo"

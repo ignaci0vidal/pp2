@@ -1,14 +1,16 @@
 class Ticket {
-  constructor(id_ticket, id_pedido, fecha_emision, tipo_factura, total, CAE, created_at, updated_at) {
+  constructor(id_ticket, id_pedido, fecha_emision, tipo_factura, total, CAE) {
     this.id_ticket = id_ticket;
     this.id_pedido = id_pedido;
     this.fecha_emision = fecha_emision;
     this.tipo_factura = tipo_factura;
     this.total = total;
     this.CAE = CAE;
-    this.created_at = created_at || new Date().toISOString();
-    this.updated_at = updated_at || new Date().toISOString();
+    // Auditoría según Reglas de Negocio:
+    this.created_at = new Date().toISOString();
+    this.updated_at = new Date().toISOString();
   }
+  
 
   // --- Getters ---
   getIdTicket() { return this.id_ticket; }
@@ -28,21 +30,27 @@ class Ticket {
     this.tipo_factura = nuevoTipo;
     this.updated_at = new Date().toISOString();
   }
+
 }
 
-module.exports = Ticket;
 
 const tickets = [];
 
-function crearTicket(datos) {
+function crearTicket(datos, pedido) {
+
+  if (pedido.estado !== "pagado") {
+    throw new Error("Error: No se puede generar un ticket para un pedido que no esté 'pagado'.");
+  }
+
   const nuevoTicket = new Ticket(
     datos.id_ticket,
-    datos.id_pedido,
-    datos.fecha_emision,
+    pedido.id_pedido, // Usamos el ID del objeto pedido directamente
+    new Date().toISOString(), // fecha_emision
     datos.tipo_factura,
-    datos.total,
+    pedido.total, // Usamos el total calculado en el pedido
     datos.CAE
   );
+  
   tickets.push(nuevoTicket);
   return nuevoTicket;
 }
@@ -68,6 +76,7 @@ function eliminarTicket(id_ticket) {
   }
   return false;
 }
+
 
 module.exports = {
   Ticket,

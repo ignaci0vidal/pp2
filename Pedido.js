@@ -9,27 +9,40 @@ class Pedido {
         this.subtotal = 0;
         this.descuentoMonto = 0;
         this.total = 0;
+        this.created_at = new Date().toISOString();
+        this.updated_at = new Date().toISOString();
     }
+    // Método para cambiar el estado cumpliendo con la regla de auditoría
+    setEstado(nuevoEstado) {
+        const estadosValidos = ["pendiente", "reservado", "pagado", "cancelado"];
+        
+        if (estadosValidos.includes(nuevoEstado)) {
+            this.estado = nuevoEstado;
+            // Regla de negocio: Actualizar siempre el campo updated_at
+            this.updated_at = new Date().toISOString();
+        } else {
+            console.error("Estado no válido");
+        }
+    }   
 
-    // El método que te faltaba:
+    // El método para agregar detalle
     agregarDetalle(detalle) {
         this.detalles.push(detalle);
         this.actualizarTotales();
     }
 
-    // Lógica para calcular subtotal, descuento y total
-    actualizarTotales(cuponObjeto = null) {
-        // Sumamos los subtotales de cada detalle
+    actualizarTotales(cuponObjeto = null, usosDelCliente = 0) {
         this.subtotal = this.detalles.reduce((acc, det) => acc + det.subtotal, 0);
         
-        // Si hay un cupón y es válido, calculamos el descuento
-        if (cuponObjeto && typeof cuponObjeto.esValido === 'function' && cuponObjeto.esValido()) {
-            this.descuentoMonto = (this.subtotal * cuponObjeto.descuento) / 100;
+        // Pasamos usosDelCliente para que el cupón valide el límite individual
+        if (cuponObjeto && typeof cuponObjeto.esValido === 'function' && cuponObjeto.esValido(usosDelCliente)) {
+            this.descuentoMonto = (this.subtotal * cuponObjeto.getDescuento()) / 100;
         } else {
             this.descuentoMonto = 0;
         }
 
         this.total = this.subtotal - this.descuentoMonto;
+        this.updated_at = new Date().toISOString();
     }
 
     // Mantén tus Getters abajo si los necesitas
@@ -42,4 +55,4 @@ class PedidoManager {
     /* tu código de manager aquí */ 
 }
 
-module.exports = { Pedido, PedidoManager };
+module.exports = Pedido;
