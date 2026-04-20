@@ -96,6 +96,7 @@ const eliminarCupon = (id) => {
 };
 
 module.exports = {
+    Cupon,
     crearCupon,
     obtenerCuponPorId,
     actualizarStockCupon,

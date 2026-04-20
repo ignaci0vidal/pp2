@@ -55,4 +55,4 @@ class Detalle_Pedido {
     }
 };
 
-module.exports = Detalle_Pedido;
+module.exports = { Detalle_Pedido };

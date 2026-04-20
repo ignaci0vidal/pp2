@@ -70,10 +70,9 @@ function eliminarTicket(id_ticket) {
 }
 
 module.exports = {
+  Ticket,
   crearTicket,
   obtenerTicket,
   actualizarTotal,
   eliminarTicket
 };
-
-

@@ -38,5 +38,6 @@ class Producto {
     this.precio = nuevoPrecio;
   }
 
-
 }
+
+module.exports = { Producto };
